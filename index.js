@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONT_END_URL,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -63,12 +63,10 @@ app.get("/products", async (req, res) => {
     if (result) {
       res.status(200).json(result.rows);
       console.log(result.rows);
-      
     }
-  } catch (err) {    
+  } catch (err) {
     res.status(500).json({ error: "SERVER ERROR" });
     console.log(err.message);
-    
   }
 });
 app.get("/products/:id", async (req, res) => {
