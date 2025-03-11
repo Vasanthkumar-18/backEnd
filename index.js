@@ -5,8 +5,9 @@ import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+env.config();
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -14,7 +15,7 @@ app.use(
     credentials: true,
   })
 );
-env.config();
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -29,23 +30,45 @@ app.use(express.json());
 // app.use(passport.session());
 
 const saltRound = 10;
-const db = new pg.Client({
-  user: process.env.PG_USER,
-  password: process.env.PG_PASSWORD,
-  database: process.env.PG_DB,
-  host: process.env.PG_HOST,
-  port: process.env.PG_PORT,
-});
-db.connect();
+// const db = new pg.Client({
+//   user: process.env.PG_USER,
+//   password: process.env.PG_PASSWORD,
+//   database: process.env.PG_DB,
+//   host: process.env.PG_HOST,
+//   port: process.env.PG_PORT,
+// });
+// db.connect();
+///
 
+const { Pool } = pg;
+
+//  Connect to Railway PostgreSQL
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+db.connect()
+  .then(() => console.log("Connected to Railway PostgreSQL"))
+  .catch((err) => console.error(" Database connection error:", err.stack));
+
+app.get("/", (req, res) => {
+  res.send(" Server is running!");
+});
 app.get("/products", async (req, res) => {
   try {
     const result = await db.query("SELECT * FROM products ORDER BY id ASC");
     if (result) {
       res.status(200).json(result.rows);
+      console.log(result.rows);
+      
     }
-  } catch (err) {
+  } catch (err) {    
     res.status(500).json({ error: "SERVER ERROR" });
+    console.log(err.message);
+    
   }
 });
 app.get("/products/:id", async (req, res) => {
@@ -222,13 +245,13 @@ app.post("/user/address", async (req, res) => {
   try {
     const { addressname, email, mobileno, pincode, states, address, landmark } =
       req.body;
-    console.log("name :", addressname);
-    console.log("email :", email);
-    console.log("mobile no :", mobileno);
-    console.log("picode :", pincode);
-    console.log("state :", states);
-    console.log("address :", address);
-    console.log("lanmark :", landmark);
+    // console.log("name :", addressname);
+    // console.log("email :", email);
+    // console.log("mobile no :", mobileno);
+    // console.log("picode :", pincode);
+    // console.log("state :", states);
+    // console.log("address :", address);
+    // console.log("lanmark :", landmark);
 
     if (
       email &&
