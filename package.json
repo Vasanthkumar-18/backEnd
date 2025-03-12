@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-   "start": "nodeon index.js"
+   "start": "nodemon index.js"
   },
   "author": "vasanth",
   "license": "ISC",
